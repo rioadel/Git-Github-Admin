@@ -1,0 +1,25 @@
+name: Enforce PR source branch
+
+on:
+  pull_request_target:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  check-source-branch:
+    name: PR into main must come from StagedBranch_Testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify head branch
+        run: |
+          echo "Head branch: $HEAD_REF"
+          if [ "$HEAD_REF" != "StagedBranch_Testing" ]; then
+            echo "::error::Pull requests into main are only allowed from StagedBranch_Testing (got '$HEAD_REF')."
+            exit 1
+          fi
+          echo "Source branch is allowed."
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
